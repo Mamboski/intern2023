@@ -1,1 +1,43 @@
+views.py Review
 
+Initial Setup
+The initial setup includes several imports from the Django REST framework, PyTorch, and other libraries for file processing. Seed initialization ensures reproducibility in the results, which is needed when random processes are involved. The code handles API views, extracts content from PDF and DOCX files, and interacts with CUDA for GPU support.
+
+Class 1: TextExtractionService
+`TextExtractionService` is a Django REST framework APIView class responsible for handling file uploads and extracting text content. 
+
+- `post` method: Accepts a file, calls `convert_file_to_text`, and responds with the extracted text.
+- File Conversion methods: Functions like `extract_text_from_pdf` and `extract_text_from_docx` are defined to process PDF and Word files, respectively. The code utilizes libraries like `docx2txt` and `fitz` to perform these conversions.
+
+Class 2: FieldsExtractionService
+`FieldsExtractionService` is another APIView class that handles more advanced text processing, including parsing and field extraction from resumes.
+
+- `post` method: Accepts a file, makes a POST request to `TextExtractionService` for text extraction, and then processes the extracted text for fields like first name, last name, skills, etc.
+- Field Extraction: The method `extract_fields_from_resume` performs complex text parsing using pre-defined prompts and the LLAMA 7B model using PyTorch. This process involves tokenizing, generating responses, and extracting the required fields.
+- Text Cleaning: The method `clean_text` cleans the text by filtering out unwanted characters.
+
+Class 3: PDFGenerationService
+`PDFGenerationService` is a Django class-based view derived from the `View` class, responsible for generating PDF files.
+
+- `get` method: Accepts a JSON string as a GET parameter, converts it to a dictionary, and utilizes it to create a PDF document.
+- PDF Creation: The method `create_pdf_from_output` uses the `FPDF` library to create a PDF document from the extracted fields, formatting it appropriately.
+
+Important Elements or Concepts
+- Reproducibility: A fixed seed ensures that random processes yield the same results across different runs.
+- Error Handling: The code accounts for unsupported file types by raising a `ValueError` when improper values occur.
+- String Manipulation: There's extensive use of string manipulation to handle text extraction, cleaning, and formatting.
+- API Interaction: The second class interacts with the first class through an HTTP request, creating an internal API dependency.
+- PDF Generation: The FPDF library creates PDFs from extracted data
+
+These classes represent a comprehensive flow of accepting file inputs, extracting and processing text data, and generating an output PDF. Text extraction, parsing, and PDF creation make this a versatile piece of code for handling document processing tasks.
+
+apps.py Review
+
+Class 1: DatabaseAppConfig
+-Inherits from Django's `AppConfig` and is responsible for configuring a Django application named 'database_app'.
+-Specifies 'BigAutoField' as the default field for automatic primary key creation. 
+
+Class 2: FileExtraction
+- Derives from `AppConfig` and is focused on loading pre-trained models for text processing. 
+- Within this class, a tokenizer and a causal language model are loaded from the "meta-llama/Llama-2-7b-chat-hf" path using the Transformers library by Hugging Face. 
+- The model loads in 8-bit to reduce memory consumption. 
